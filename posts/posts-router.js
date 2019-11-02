@@ -17,19 +17,15 @@ router.post("/", (req, res) => {
         if (post) {
           return res.status(201).json(post);
         }
-        return res
-          .status(500)
-          .json({
-            error: "There was an error while saving the post to the database"
-          });
+        return res.status(500).json({
+          error: "There was an error while saving the post to the database"
+        });
       });
     })
     .catch(err => {
-      return res
-        .status(500)
-        .json({
-          error: "There was an error while saving the post to the database"
-        });
+      return res.status(500).json({
+        error: "There was an error while saving the post to the database"
+      });
     });
 });
 
@@ -50,20 +46,29 @@ router.post("/:id/comments", (req, res) => {
           return res.status(201).json(comment);
         })
         .catch(err => {
-          return res
-            .status(500)
-            .json({
-              error:
-                "There was an error while saving the comment to the database"
-            });
+          return res.status(500).json({
+            error: "There was an error while saving the comment to the database"
+          });
         });
     })
     .catch(err => {
+      return res.status(404).json({
+        message: `The post with the specified ID, ${id}, does not exist.`
+      });
+    });
+});
+
+// Get all posts
+
+router.get("/", (req, res) => {
+  db.find()
+    .then(posts => {
+      return res.status(200).json(posts);
+    })
+    .catch(err => {
       return res
-        .status(404)
-        .json({
-          message: `The post with the specified ID, ${id}, does not exist.`
-        });
+        .status(500)
+        .json({ error: "The posts information could not be retrieved." });
     });
 });
 
