@@ -106,7 +106,9 @@ router.get("/:id/comments", (req, res) => {
       db.findPostComments(id)
         .then(comments => {
           if (comments.length === 0) {
-            return res.status(200).json({ message: "There are no comments on this post yet" })
+            return res
+              .status(200)
+              .json({ message: "There are no comments on this post yet" });
           }
           return res.status(200).json(comments);
         })
@@ -120,6 +122,23 @@ router.get("/:id/comments", (req, res) => {
       return res
         .status(500)
         .json({ error: "The post information could not be retrieved." });
+    });
+});
+
+router.delete("/:id", (req, res) => {
+  const id = req.params.id;
+  db.remove(id)
+    .then(count => {
+      console.log(count);
+      if (count === 0) {
+        return res
+          .status(404)
+          .json({ message: "The post with the specified ID does not exist." });
+      }
+      return res.status(200).json({ message: "The post has successfully been deleted."})
+    })
+    .catch(err => {
+      return res.status(500).json({ error: "The post could not be removed." });
     });
 });
 
