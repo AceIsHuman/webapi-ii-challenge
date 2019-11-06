@@ -94,35 +94,26 @@ router.get("/:id", (req, res) => {
 
 // Get comments from single post
 
-router.get("/:id/comments", (req, res) => {
-  const id = req.params.id;
-  db.findById(id)
-    .then(post => {
-      if (post.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "The post with the specified ID does not exist." });
-      }
-      db.findPostComments(id)
-        .then(comments => {
-          if (comments.length === 0) {
-            return res
-              .status(200)
-              .json({ message: "There are no comments on this post yet" });
-          }
-          return res.status(200).json(comments);
-        })
-        .catch(err => {
-          return res
-            .status(500)
-            .json({ error: "The comments information could not be retrieved" });
-        });
-    })
-    .catch(err => {
+router.get("/:id/comments", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const post = await db.findById(id).first();
+    if (!post) {
       return res
-        .status(500)
-        .json({ error: "The post information could not be retrieved." });
-    });
+        .status(404)
+        .json({ message: "The post with the specified ID does not exist." });
+    }
+    const comments = await db.findPostComments(id).first();
+    return !comments
+      ? res
+          .status(200)
+          .json({ message: "There are no comments on this post yet" })
+      : res.status(200).json(comments);
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ error: "The comments information could not be retrieved" });
+  }
 });
 
 // Delete a post
